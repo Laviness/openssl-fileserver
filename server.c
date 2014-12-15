@@ -169,7 +169,7 @@ int  main ()
     //receive file step.2 receive data in chunks of 256 bytes
     char recvBuff[256];
     int bytesReceived=0;
-    memset(recvBuff,’0’,sizeof(recvBuff));
+    memset(recvBuff,'0',sizeof(recvBuff));
     while((bytesReceived = read(sock, recvBuff, 256)) > 0)
         
     {
