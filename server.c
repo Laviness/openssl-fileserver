@@ -1,4 +1,4 @@
-//  client
+//  server
 //
 //  Created by Liu Yuqi on 14/11/24.
 //  Copyright (c) 2014年 Liu Yuqi. All rights reserved.
@@ -24,8 +24,6 @@
 #define SERVER_PORT    1234
 #define SERVER "127.0.0.1"
 
-#define MSGLENGTH 1024
-
 int  main ()
 {
     
@@ -35,7 +33,6 @@ int  main ()
     SSL_CTX *ctx;       //init CTX
     SSL_METHOD *meth;   //init the way communicate
     SSL *ssl;           //init for build socket
-    int i;
     
     void SSL_load_error_strings(void);    // registers the error strings for libcrypto and libssl
     SSL_library_init();                 //register the cipher and message
@@ -64,7 +61,7 @@ int  main ()
     //creating and setting up the socket
     struct sockaddr_in sa_serv;
     
-    listen_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    int listen_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
     CHK_ERR(listen_sock, "socket");
     
     memset(&sa_serv, 0, sizeof(sa_serv));
@@ -72,7 +69,7 @@ int  main ()
     sa_serv.sin_addr.s_addr = INADDR_ANY;
     sa_serv.sin_port        = htons(SERVER_PORT);      /* Server Port number */
     
-    err = bind(listen_sock, (struct sockaddr*)&sa_serv,sizeof(sa_serv));
+    int err = bind(listen_sock, (struct sockaddr*)&sa_serv,sizeof(sa_serv));
     CHK_ERR(err, "bind");
     
     /* Receive a TCP connection. */
@@ -83,8 +80,8 @@ int  main ()
     struct sockaddr_in sa_cli;
     int client_len=0;
 
-    sock = accept(listen_sock, (struct sockaddr*)&sa_cli, &client_len);
-    BIO_printf(bio_c_out, "Connection from %lx, port %x\n",
+    int sock = accept(listen_sock, (struct sockaddr*)&sa_cli, &client_len);
+    printf( "Connection from %lx, port %x\n",
                sa_cli.sin_addr.s_addr, sa_cli.sin_port);
     
     //setting up the socket BIO
@@ -104,7 +101,7 @@ int  main ()
     // generate RSA structure
     
     FILE *fp;
-    fp=fopen("private.pem","rb")
+    fp=fopen("private.pem","rb");
     RSA *rsa=NULL;
     rsa = PEM_read_RSAPrivateKey(fp,rsa,NULL,NULL);
     
@@ -113,7 +110,6 @@ int  main ()
     char *privKey;
     char ch;
     long size=0;
-    FILE *fp;
     fp=fopen("private.pem","rb");
     ch=fgetc(fp);
     while(ch!=EOF)
@@ -135,7 +131,7 @@ int  main ()
     if (dflag<0)
     {
         ERR_print_errors_fp(stderr);
-        printf(“decrypt failed.\n”);
+        printf("decrypt failed.\n");
     }
 
     //hash the challenge
@@ -151,7 +147,7 @@ int  main ()
     if (eflag<0)
     {
         ERR_print_errors_fp(stderr);
-        printf(“encrypt failed.\n”);
+        printf("encrypt failed.\n");
     }
     
     //send the encrypted message to client
@@ -192,10 +188,10 @@ int  main ()
 {
     //send file step.1 open the file that wish to transfer
                
-    fp=fopen(“sample.txt”,”rb”);
+    fp=fopen("sample.txt","rb");
     if(fp==NULL)
     {
-        printf(“File open failed”);
+        printf("File open failed");
         return -1;
     }
                
@@ -205,7 +201,7 @@ int  main ()
     {
         unsigned char buff[256]={0};
         int nread=fread(buff,1,256,fp);
-        printf(“Bytes read %d \n”, nread);
+        printf("Bytes read %d \n", nread);
                    
         if(nread>0)
             {
@@ -213,7 +209,7 @@ int  main ()
                 write(sock,buff,nread);
             }
                    
-        if(read<256)
+        if(nread<256)
             {
                 if (foe(fp))
                 printf("End of file\n");
