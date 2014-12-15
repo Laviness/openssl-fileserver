@@ -35,7 +35,6 @@ int  main ()
     SSL_CTX *ctx;       //init CTX
     SSL_METHOD *meth;   //init the way communicate
     SSL *ssl;           //init for build socket
-    int i;
     
     void SSL_load_error_strings(void);    // registers the error strings for libcrypto and libssl
     SSL_library_init();                 //register the cipher and message
@@ -65,7 +64,11 @@ int  main ()
     struct sockaddr_in server_addr;
     
     sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    CHK_ERR(sock, "socket");
+    if(sock< 0)
+    {
+        printf("socket establishment fail.\n");
+    }
+    
     
     memset (&server_addr, '\0', sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -73,7 +76,11 @@ int  main ()
     server_addr.sin_addr.s_addr = inet_addr(SERVER); /* Server IP */
     
     err = connect(sock, (struct sockaddr*) &server_addr, sizeof(server_addr));
-    CHK_ERR(err, "connect");
+    if(err< 0)
+    {
+        printf("connect fail.\n");
+    }
+    
             
     //setting up the socket BIO
             
@@ -115,7 +122,7 @@ int  main ()
             if (eflag<0)
             {
                 ERR_print_errors_fp(stderr);
-                printf(“Encrypt failed.\n”);
+                printf("Encrypt failed.\n");
             }
                                 
     //read hashed info from server
@@ -134,11 +141,11 @@ int  main ()
             cflag=strcmp(obuf,ohash);
             if (flag==0)
             {
-                printf(“authentication successful.\n”);
+                printf("authentication successful.\n");
             }
             else
             {
-                printf(“Authentication failed. Preparing for Disconnection.\n”);
+                printf("Authentication failed. Preparing for Disconnection.\n");
                 SSL_shutdown(ssl);
             }
                                 
@@ -197,7 +204,7 @@ int  main ()
             {
                 unsigned char buff[256]={0};
                 int nread=fread(buff,1,256,fp);
-                printf(“Bytes read %d \n”, nread);
+                printf("Bytes read %d \n", nread);
                 
                 if(nread>0)
                 {
@@ -205,11 +212,13 @@ int  main ()
                     write(sock,buff,nread);
                 }
                                         
-                if(read<256)
+                if(nread<256)
                     {
-                        if (foe(fp))
+                        if (fp==EOF)
+                        {
                         printf("End of file\n");
                         break;
+                        }
                     }
             }
 }
