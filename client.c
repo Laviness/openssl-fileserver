@@ -132,7 +132,7 @@ int  main ()
                                 
     //decrypt the data
             unsigned char obuf[20];
-            int dflag=RSA_public_derypt(512,encryphash,obuf,rsa,RSA_PKCS1_PADDING);
+            int dflag=RSA_public_decrypt(512,encryphash,obuf,rsa,RSA_PKCS1_PADDING);
                                 
                                 
                                 
