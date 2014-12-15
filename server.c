@@ -62,7 +62,10 @@ int  main ()
     struct sockaddr_in sa_serv;
     
     int listen_sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    CHK_ERR(listen_sock, "socket");
+    if(listen_sock< 0)
+    {
+        printf("socket establishment fail.\n");
+    }
     
     memset(&sa_serv, 0, sizeof(sa_serv));
     sa_serv.sin_family      = AF_INET;
@@ -70,11 +73,17 @@ int  main ()
     sa_serv.sin_port        = htons(SERVER_PORT);      /* Server Port number */
     
     int err = bind(listen_sock, (struct sockaddr*)&sa_serv,sizeof(sa_serv));
-    CHK_ERR(err, "bind");
+    if(err< 0)
+    {
+        printf("bind to client failed.\n");
+    }
     
     /* Receive a TCP connection. */
     err = listen(listen_sock, 5);
-    CHK_ERR(err, "listen");
+    if(err< 0)
+    {
+        printf("listen failed.\n");
+    }
             
     //Establishing the connection
     struct sockaddr_in sa_cli;
@@ -211,9 +220,11 @@ int  main ()
                    
         if(nread<256)
             {
-                if (foe(fp))
+                if (fp==EOF)
+                {
                 printf("End of file\n");
                 break;
+                }
             }
     }
 }
